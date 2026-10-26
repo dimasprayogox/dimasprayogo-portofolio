@@ -7,6 +7,7 @@ export interface Project {
   tags: string[];
   githubUrl?: string;
   demoUrl?: string;
+  images?: string[];
   imageUrl?: string;
   featured: boolean;
   createdAt: string;
@@ -15,7 +16,7 @@ export interface Project {
 export interface Skill {
   id: string;
   name: string;
-  category: "Frontend" | "Backend" | "Database" | "DevOps & Tools";
+  category: "Bahasa Pemrograman" | "Frontend" | "Backend & API" | "Database" | "Tools" | string;
   level: string;
   icon?: string;
 }
@@ -25,6 +26,7 @@ export interface Experience {
   role: string;
   company: string;
   period: string;
+  location?: string;
   description: string[];
   skills: string[];
 }
@@ -34,6 +36,7 @@ export interface Education {
   degree: string;
   institution: string;
   period: string;
+  gpa?: string;
   description?: string;
 }
 
@@ -42,6 +45,7 @@ export interface Certification {
   title: string;
   issuer: string;
   issueDate: string;
+  credentialId?: string;
   credentialUrl?: string;
   pdfUrl?: string;
 }

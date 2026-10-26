@@ -7,26 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { uploadPortfolioAsset } from "@/lib/storage";
+import { MOCK_CERTIFICATIONS } from "@/features/certifications/data";
 import { Plus, Award, Trash2, FileText, Upload, X, CheckCircle2, ExternalLink } from "lucide-react";
 
 export default function AdminCertificationsPage() {
-  const [certs, setCerts] = useState<Certification[]>([
-    {
-      id: "1",
-      title: "Meta Full Stack Developer Certificate",
-      issuer: "Coursera / Meta",
-      issueDate: "2024",
-      credentialUrl: "https://coursera.org/verify/meta-fullstack",
-      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-    },
-    {
-      id: "2",
-      title: "AWS Certified Developer – Associate",
-      issuer: "Amazon Web Services",
-      issueDate: "2023",
-      credentialUrl: "https://aws.amazon.com/verification",
-    },
-  ]);
+  const [certs, setCerts] = useState<Certification[]>(MOCK_CERTIFICATIONS);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -102,7 +87,15 @@ export default function AdminCertificationsPage() {
             </div>
 
             <h2 className="text-base font-semibold text-white">{c.title}</h2>
-            <p className="text-xs text-zinc-400 font-mono">Issued: {c.issueDate}</p>
+            <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400 font-mono">
+              <span>Issued: {c.issueDate}</span>
+              {c.credentialId && (
+                <>
+                  <span>•</span>
+                  <span>ID: {c.credentialId}</span>
+                </>
+              )}
+            </div>
 
             <div className="flex flex-wrap gap-2 pt-2 border-t border-zinc-900">
               {c.pdfUrl && (

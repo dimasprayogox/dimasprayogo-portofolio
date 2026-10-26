@@ -32,6 +32,8 @@ export async function uploadToR2Action(formData: FormData): Promise<{ success: b
           accessKeyId,
           secretAccessKey,
         },
+        requestChecksumCalculation: "WHEN_REQUIRED",
+        responseChecksumValidation: "WHEN_REQUIRED",
       });
 
       await R2.send(
@@ -39,13 +41,15 @@ export async function uploadToR2Action(formData: FormData): Promise<{ success: b
           Bucket: bucketName,
           Key: fileName,
           Body: buffer,
-          ContentType: file.type,
+          ContentType: file.type || "application/octet-stream",
         })
       );
 
-      return { success: true, url: `${publicDomain}/${fileName}` };
+      const publicUrl = `${publicDomain}/${fileName}`;
+      return { success: true, url: publicUrl };
     } catch (error: any) {
-      console.warn("Cloudflare R2 Upload Warning:", error.message);
+      console.error("Cloudflare R2 Upload Error:", error.message);
+      return { success: false, url: `${publicDomain}/${fileName}` };
     }
   }
 

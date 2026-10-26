@@ -17,7 +17,7 @@ export default function AdminSkillsPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {["Frontend", "Backend", "Database", "DevOps & Tools"].map((cat) => (
+        {["Bahasa Pemrograman", "Frontend", "Backend & API", "Database", "Tools"].map((cat) => (
           <div key={cat} className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 space-y-3">
             <h2 className="text-xs font-mono text-zinc-400 uppercase tracking-wider">{cat}</h2>
             <div className="space-y-2">

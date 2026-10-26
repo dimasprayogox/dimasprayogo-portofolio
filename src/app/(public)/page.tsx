@@ -1,17 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { SITE_CONFIG } from "@/constants/site";
-import { MOCK_PROJECTS } from "@/features/projects/data";
+import { MOCK_PROJECTS, getProjects } from "@/features/projects/data";
 import { MOCK_SKILLS } from "@/features/skills/data";
 import { MOCK_EXPERIENCES } from "@/features/experience/data";
+import { MOCK_EDUCATION } from "@/features/education/data";
+import { MOCK_CERTIFICATIONS } from "@/features/certifications/data";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GithubIcon } from "@/components/shared/icons";
-import { ArrowUpRight, ExternalLink, Mail, CheckCircle2, Terminal } from "lucide-react";
-import { Project, Experience, Skill } from "@/types";
+import { ArrowUpRight, ExternalLink, Mail, CheckCircle2, Terminal, Images, GraduationCap, Award } from "lucide-react";
+import { Project, Experience, Skill, Education, Certification } from "@/types";
 import HeroSection from "@/components/home/hero-section";
 import BorderGlow from "@/components/ui/border-glow";
 import { motion } from "motion/react";
@@ -19,7 +21,13 @@ import { motion } from "motion/react";
 const easeCurve: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 export default function HomePage() {
-  const featuredProjects = MOCK_PROJECTS.filter((p: Project) => p.featured);
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    getProjects().then(setProjects);
+  }, []);
+
+  const featuredProjects = projects.filter((p: Project) => Boolean(p.featured));
 
   return (
     <div className="space-y-24">
@@ -43,78 +51,101 @@ export default function HomePage() {
             href="/projects"
             className="text-xs font-mono text-zinc-400 hover:text-white transition-colors flex items-center gap-1 group"
           >
-            View all ({MOCK_PROJECTS.length}) <ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            View all ({projects.length}) <ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
         </motion.div>
 
-        <div className="grid gap-6 sm:grid-cols-2">
-          {featuredProjects.map((project: Project, index: number) => {
-            const isEven = index % 2 === 0;
-            return (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, x: isEven ? -40 : 40, y: 15 }}
-                whileInView={{ opacity: 1, x: 0, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.7, ease: easeCurve, delay: index * 0.18 }}
-              >
-                <Card className="flex flex-col justify-between group overflow-hidden p-0 h-full">
-                  {project.imageUrl && (
-                    <div className="h-44 w-full overflow-hidden bg-zinc-900 border-b border-zinc-800 relative">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={project.imageUrl}
-                        alt={project.title}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </div>
-                  )}
-                  <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <Link href={`/projects/${project.slug}`} className="group-hover:underline">
-                          <CardTitle>{project.title}</CardTitle>
-                        </Link>
-                        <div className="flex items-center gap-2 text-zinc-400 shrink-0">
-                          {project.githubUrl && (
-                            <a
-                              href={project.githubUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="hover:text-white transition-colors"
-                              aria-label="GitHub Repository"
-                            >
-                              <GithubIcon className="h-4 w-4" />
-                            </a>
-                          )}
-                          {project.demoUrl && (
-                            <a
-                              href={project.demoUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="hover:text-white transition-colors"
-                              aria-label="Live Demo"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                            </a>
-                          )}
+        {featuredProjects.length === 0 ? (
+          <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-8 text-center text-xs font-mono text-zinc-500">
+            No featured projects yet.
+          </div>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2">
+            {featuredProjects.map((project: Project, index: number) => {
+              const isEven = index % 2 === 0;
+              const coverImage =
+                project.images && project.images.length > 0
+                  ? project.images[0]
+                  : project.imageUrl;
+              const totalImages =
+                project.images?.length || (project.imageUrl ? 1 : 0);
+
+              return (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, x: isEven ? -40 : 40, y: 15 }}
+                  whileInView={{ opacity: 1, x: 0, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.7, ease: easeCurve, delay: index * 0.18 }}
+                  className="relative group h-full"
+                >
+                  <Card className="flex flex-col justify-between overflow-hidden p-0 h-full hover:border-zinc-700 transition-colors relative">
+                    {coverImage && (
+                      <div className="h-44 w-full overflow-hidden bg-zinc-900 border-b border-zinc-800 relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={coverImage}
+                          alt={project.title}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        {totalImages > 1 && (
+                          <div className="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-black/75 px-1.5 py-0.5 text-[10px] font-mono text-zinc-300 backdrop-blur-xs">
+                            <Images className="h-3 w-3" />
+                            {totalImages}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <CardTitle className="group-hover:underline">{project.title}</CardTitle>
+                          <div className="flex items-center gap-2 text-zinc-400 shrink-0 relative z-20">
+                            {project.githubUrl && (
+                              <a
+                                href={project.githubUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-white transition-colors p-1"
+                                aria-label="GitHub Repository"
+                              >
+                                <GithubIcon className="h-4 w-4" />
+                              </a>
+                            )}
+                            {project.demoUrl && (
+                              <a
+                                href={project.demoUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-white transition-colors p-1"
+                                aria-label="Live Demo"
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </a>
+                            )}
+                          </div>
                         </div>
+
+                        <CardDescription>{project.description}</CardDescription>
                       </div>
 
-                      <CardDescription>{project.description}</CardDescription>
+                      <div className="mt-4 flex flex-wrap gap-1.5 pt-3 border-t border-zinc-900">
+                        {project.tags.map((tag: string) => (
+                          <Badge key={tag}>{tag}</Badge>
+                        ))}
+                      </div>
                     </div>
-
-                    <div className="mt-4 flex flex-wrap gap-1.5 pt-3 border-t border-zinc-900">
-                      {project.tags.map((tag: string) => (
-                        <Badge key={tag}>{tag}</Badge>
-                      ))}
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-            );
-          })}
-        </div>
+                  </Card>
+                  <Link
+                    href={`/projects/${project.slug}`}
+                    className="absolute inset-0 z-10"
+                    aria-label={`View ${project.title} details`}
+                  />
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* Experience Timeline Section */}
@@ -148,6 +179,9 @@ export default function HomePage() {
                   </h3>
                   <span className="text-xs font-mono text-zinc-400">{exp.period}</span>
                 </div>
+                {exp.location && (
+                  <p className="text-xs font-mono text-zinc-500">{exp.location}</p>
+                )}
                 <ul className="space-y-1 text-sm text-zinc-400 list-disc list-inside">
                   {exp.description.map((item: string, idx: number) => (
                     <li key={idx} className="leading-relaxed">
@@ -168,6 +202,108 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Riwayat Pendidikan Section */}
+      <section className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.6, ease: easeCurve }}
+          className="border-b border-zinc-800 pb-4"
+        >
+          <div className="flex items-center gap-2">
+            <GraduationCap className="h-5 w-5 text-zinc-400" />
+            <h2 className="text-xl font-bold text-white tracking-tight">Riwayat Pendidikan</h2>
+          </div>
+        </motion.div>
+
+        <div className="space-y-4">
+          {MOCK_EDUCATION.map((edu: Education, index: number) => (
+            <motion.div
+              key={edu.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.65, ease: easeCurve, delay: index * 0.2 }}
+              className="rounded-xl border border-zinc-800 bg-zinc-950 p-6 space-y-3"
+            >
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <div>
+                  <h3 className="text-base font-semibold text-white">{edu.institution}</h3>
+                  <p className="text-sm text-zinc-300">
+                    {edu.degree} {edu.gpa ? <span className="font-mono text-xs text-zinc-400">| IPK: {edu.gpa}</span> : null}
+                  </p>
+                </div>
+                <span className="text-xs font-mono text-zinc-400">{edu.period}</span>
+              </div>
+              {edu.description && (
+                <p className="text-sm text-zinc-400 leading-relaxed pt-1">
+                  {edu.description}
+                </p>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Sertifikasi Section */}
+      <section className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.6, ease: easeCurve }}
+          className="border-b border-zinc-800 pb-4"
+        >
+          <div className="flex items-center gap-2">
+            <Award className="h-5 w-5 text-zinc-400" />
+            <h2 className="text-xl font-bold text-white tracking-tight">Sertifikasi</h2>
+          </div>
+        </motion.div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {MOCK_CERTIFICATIONS.map((cert: Certification, index: number) => {
+            const isEven = index % 2 === 0;
+            return (
+              <motion.div
+                key={cert.id}
+                initial={{ opacity: 0, x: isEven ? -30 : 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.65, ease: easeCurve, delay: index * 0.15 }}
+              >
+                <Card className="p-5 space-y-3 h-full flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs font-mono text-emerald-400">
+                      <span>{cert.issuer}</span>
+                      <span className="text-zinc-500">{cert.issueDate}</span>
+                    </div>
+                    <h3 className="text-sm font-semibold text-white leading-snug">{cert.title}</h3>
+                    {cert.credentialId && (
+                      <p className="text-xs font-mono text-zinc-400">
+                        Kredensial: <span className="text-zinc-200">{cert.credentialId}</span>
+                      </p>
+                    )}
+                  </div>
+                  {cert.credentialUrl && (
+                    <div className="pt-2 border-t border-zinc-900">
+                      <a
+                        href={cert.credentialUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-white transition-colors"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" /> Lihat Sertifikat
+                      </a>
+                    </div>
+                  )}
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+      </section>
+
       {/* Tech Stack & Skills Section */}
       <section className="space-y-6">
         <motion.div
@@ -177,11 +313,11 @@ export default function HomePage() {
           transition={{ duration: 0.6, ease: easeCurve }}
           className="border-b border-zinc-800 pb-4"
         >
-          <h2 className="text-xl font-bold text-white tracking-tight">Skills & Tech Stack</h2>
+          <h2 className="text-xl font-bold text-white tracking-tight">Keahlian & Tech Stack</h2>
         </motion.div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {["Frontend", "Backend", "Database", "DevOps & Tools"].map((category: string, index: number) => {
+          {["Bahasa Pemrograman", "Frontend", "Backend & API", "Database", "Tools"].map((category: string, index: number) => {
             const categorySkills = MOCK_SKILLS.filter((s: Skill) => s.category === category);
 
             // Varied entrance direction per card (Left, Right, Fade Down, Zoom In)

@@ -1,30 +1,58 @@
+"use client";
+
+import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { MOCK_PROJECTS } from "@/features/projects/data";
+import { getProjectBySlug } from "@/features/projects/services";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { GithubIcon } from "@/components/shared/icons";
-import { ArrowLeft, ExternalLink, Calendar } from "lucide-react";
+import { ArrowLeft, ExternalLink, Calendar, Image as ImageIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { Project } from "@/types";
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const project = MOCK_PROJECTS.find((p: Project) => p.slug === slug);
-  if (!project) return { title: "Project Not Found" };
-  return { title: project.title, description: project.description };
-}
-
-export default async function ProjectDetailPage({
+export default function ProjectDetailPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
-  const project = MOCK_PROJECTS.find((p: Project) => p.slug === slug);
+  const { slug } = use(params);
+  const [project, setProject] = useState<Project | null>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    getProjectBySlug(slug).then((res) => {
+      if (isMounted) {
+        setProject(res);
+        setLoading(false);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="space-y-6 max-w-3xl py-12 text-center text-xs font-mono text-zinc-500">
+        Loading project details...
+      </div>
+    );
+  }
 
   if (!project) {
-    notFound();
+    return (
+      <div className="space-y-6 max-w-3xl py-12 text-center space-y-4">
+        <h1 className="text-2xl font-bold text-white">Project Not Found</h1>
+        <p className="text-sm text-zinc-400">The requested project could not be located.</p>
+        <Link href="/projects">
+          <Button variant="outline" size="sm">
+            <ArrowLeft className="h-4 w-4" /> Back to all projects
+          </Button>
+        </Link>
+      </div>
+    );
   }
 
   return (
@@ -41,7 +69,11 @@ export default async function ProjectDetailPage({
           <Calendar className="h-3.5 w-3.5" />
           <span>{formatDate(project.createdAt)}</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">{project.title}</h1>
+
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+          {project.title}
+        </h1>
+
         <p className="text-lg text-zinc-300 leading-relaxed">{project.description}</p>
 
         <div className="flex flex-wrap gap-2 pt-2">
@@ -68,31 +100,106 @@ export default async function ProjectDetailPage({
         </div>
       </div>
 
-      {/* Project Screenshot Display */}
-      {project.imageUrl ? (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950 overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={project.imageUrl}
-            alt={project.title}
-            className="w-full h-auto object-cover max-h-[500px]"
-          />
-        </div>
-      ) : (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-8 text-center space-y-3">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900 text-zinc-400">
-            <ExternalLink className="h-6 w-6" />
+      {/* Project Screenshots Gallery */}
+      {(() => {
+        const images =
+          project.images && project.images.length > 0
+            ? project.images
+            : project.imageUrl
+            ? [project.imageUrl]
+            : [];
+
+        if (images.length === 0) {
+          return (
+            <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-12 text-center space-y-3">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900 text-zinc-500">
+                <ImageIcon className="h-6 w-6" />
+              </div>
+              <p className="text-sm font-mono text-zinc-400">No screenshot provided</p>
+              <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+                Visit the live demo or source code links above to view the project in action.
+              </p>
+            </div>
+          );
+        }
+
+        const currentImg = images[activeImageIndex] || images[0];
+
+        return (
+          <div className="space-y-3">
+            <div className="relative rounded-xl border border-zinc-800 bg-zinc-950 overflow-hidden shadow-2xl">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={currentImg}
+                alt={`${project.title} screenshot ${activeImageIndex + 1}`}
+                className="w-full h-auto object-cover max-h-[500px]"
+              />
+
+              {images.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActiveImageIndex((prev) =>
+                        prev > 0 ? prev - 1 : images.length - 1
+                      )
+                    }
+                    className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/70 p-2 text-white/80 hover:text-white hover:bg-black/90 transition-colors cursor-pointer"
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActiveImageIndex((prev) =>
+                        prev < images.length - 1 ? prev + 1 : 0
+                      )
+                    }
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/70 p-2 text-white/80 hover:text-white hover:bg-black/90 transition-colors cursor-pointer"
+                    aria-label="Next image"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                  <div className="absolute bottom-3 right-3 rounded bg-black/80 px-2.5 py-1 text-xs font-mono text-zinc-300 backdrop-blur-xs">
+                    {activeImageIndex + 1} / {images.length}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {images.length > 1 && (
+              <div className="flex gap-2.5 overflow-x-auto pb-1">
+                {images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-lg border transition-all cursor-pointer ${
+                      activeImageIndex === idx
+                        ? "border-emerald-500 ring-2 ring-emerald-500/20"
+                        : "border-zinc-800 opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          <p className="text-sm font-mono text-zinc-400">Interactive Preview & Screenshots</p>
-          <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-            Visit the live deployment or source repository above to inspect the complete application architecture.
-          </p>
-        </div>
-      )}
+        );
+      })()}
 
       <div className="space-y-4 text-zinc-300 leading-relaxed">
         <h2 className="text-xl font-bold text-white">Project Overview</h2>
-        <p>{project.longDescription || project.description}</p>
+        <div className="whitespace-pre-line text-sm text-zinc-300 leading-relaxed">
+          {project.longDescription || project.description}
+        </div>
       </div>
     </div>
   );

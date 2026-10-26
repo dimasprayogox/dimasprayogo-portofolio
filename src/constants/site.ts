@@ -1,12 +1,14 @@
 export const SITE_CONFIG = {
   name: "Dimas Prayogo",
-  role: "Full Stack Developer",
-  bio: "Crafting minimalist, high-performance web applications with modern tech stacks. Focused on clean code, seamless user experiences, and scalable solutions.",
-  location: "Indonesia",
-  email: "dimasprayogo@example.com",
-  github: "https://github.com/dimasprayogo",
-  linkedin: "https://linkedin.com/in/dimasprayogo",
-  status: "Available for projects",
+  role: "Software Engineer",
+  bio: "Lulusan S1 Teknik Informatika dengan pengalaman magang sebagai Software Engineer. Memiliki kemampuan dalam pengembangan perangkat lunak, analisis dan perancangan sistem, serta problem solving.",
+  location: "Madiun, Jawa Timur",
+  email: "dimasprayogo9c@gmail.com",
+  phone: "+62 813 5819 9715",
+  website: "https://dimaaspryg.my.id",
+  github: "https://github.com/dimasprayogox",
+  linkedin: "https://linkedin.com/in/dimas-prayogo1",
+  status: "Available for opportunities",
 };
 
 export const PUBLIC_NAV_ITEMS = [
