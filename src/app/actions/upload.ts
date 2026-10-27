@@ -45,14 +45,15 @@ export async function uploadToR2Action(formData: FormData): Promise<{ success: b
         })
       );
 
-      const publicUrl = `${publicDomain}/${fileName}`;
-      return { success: true, url: publicUrl };
+      const isBlockedDevDomain = publicDomain.includes(".r2.dev");
+      const assetUrl = isBlockedDevDomain ? `/api/assets/${fileName}` : `${publicDomain}/${fileName}`;
+      return { success: true, url: assetUrl };
     } catch (error: any) {
-      console.error("Cloudflare R2 Upload Error:", error.message);
-      return { success: false, url: `${publicDomain}/${fileName}` };
+      console.error("Cloudflare R2 Upload Error:", error?.message);
+      return { success: false, url: `/api/assets/${fileName}` };
     }
   }
 
   // Fallback mock public URL if R2 credentials are not set yet
-  return { success: true, url: `${publicDomain}/${fileName}` };
+  return { success: true, url: `/api/assets/${fileName}` };
 }

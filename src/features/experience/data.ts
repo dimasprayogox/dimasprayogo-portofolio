@@ -18,7 +18,7 @@ export const MOCK_EXPERIENCES: Experience[] = [
   },
   {
     id: "2",
-    role: "IT Support Staff (PKL)",
+    role: "IT Support Staff (Magang)",
     company: "UPT Komputer Universitas PGRI Madiun",
     period: "November 2020 – Maret 2021",
     location: "Madiun, Jawa Timur, Indonesia",

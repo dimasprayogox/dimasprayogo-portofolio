@@ -35,7 +35,7 @@ export default function HomePage() {
       <HeroSection />
 
       {/* Featured Projects Section */}
-      <section className="space-y-6">
+      <section id="projects" className="space-y-6">
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -149,7 +149,7 @@ export default function HomePage() {
       </section>
 
       {/* Experience Timeline Section */}
-      <section className="space-y-6">
+      <section id="experience" className="space-y-6">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -173,10 +173,16 @@ export default function HomePage() {
                 className="relative pl-6 space-y-2 group"
               >
                 <div className="absolute -left-[5px] top-1.5 h-2 w-2 rounded-full bg-zinc-400 transition-colors group-hover:bg-emerald-400" />
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <h3 className="text-base font-semibold text-white">
-                    {exp.role} <span className="text-zinc-400 font-normal">@ {exp.company}</span>
-                  </h3>
+                <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 sm:gap-2">
+                  <div>
+                    <h3 className="text-base font-semibold text-white">
+                      {exp.role}
+                      <span className="hidden sm:inline text-zinc-400 font-normal"> @ {exp.company}</span>
+                    </h3>
+                    <p className="text-xs text-zinc-400 sm:hidden">
+                      {exp.company}
+                    </p>
+                  </div>
                   <span className="text-xs font-mono text-zinc-400">{exp.period}</span>
                 </div>
                 {exp.location && (
@@ -203,7 +209,7 @@ export default function HomePage() {
       </section>
 
       {/* Riwayat Pendidikan Section */}
-      <section className="space-y-6">
+      <section id="education" className="space-y-6">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -247,7 +253,7 @@ export default function HomePage() {
       </section>
 
       {/* Sertifikasi Section */}
-      <section className="space-y-6">
+      <section id="certifications" className="space-y-6">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -305,7 +311,7 @@ export default function HomePage() {
       </section>
 
       {/* Tech Stack & Skills Section */}
-      <section className="space-y-6">
+      <section id="skills" className="space-y-6">
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -316,7 +322,7 @@ export default function HomePage() {
           <h2 className="text-xl font-bold text-white tracking-tight">Keahlian & Tech Stack</h2>
         </motion.div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-2.5 sm:gap-4 sm:grid-cols-2">
           {["Bahasa Pemrograman", "Frontend", "Backend & API", "Database", "Tools"].map((category: string, index: number) => {
             const categorySkills = MOCK_SKILLS.filter((s: Skill) => s.category === category);
 
@@ -342,24 +348,24 @@ export default function HomePage() {
                   edgeSensitivity={35}
                   glowColor="0 0 100"
                   backgroundColor="#09090b"
-                  borderRadius={16}
-                  glowRadius={30}
+                  borderRadius={14}
+                  glowRadius={25}
                   glowIntensity={1.0}
                   coneSpread={30}
                   animated={false}
                   colors={["#ffffff", "#e4e4e7", "#a1a1aa"]}
                 >
-                  <div className="p-6 space-y-3">
-                    <h3 className="text-sm font-mono text-zinc-400 uppercase tracking-wider">
+                  <div className="p-3.5 sm:p-6 space-y-2 sm:space-y-3">
+                    <h3 className="text-xs sm:text-sm font-mono text-zinc-400 uppercase tracking-wider">
                       {category}
                     </h3>
-                    <div className="flex flex-wrap gap-2 pt-1">
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2 pt-0.5 sm:pt-1">
                       {categorySkills.map((skill: Skill) => (
                         <span
                           key={skill.id}
-                          className="inline-flex items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-900/80 px-3 py-1.5 text-xs font-medium text-zinc-200 transition-colors hover:border-zinc-700 hover:text-white"
+                          className="inline-flex items-center gap-1 sm:gap-1.5 rounded-md border border-zinc-800 bg-zinc-900/80 px-2 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-medium text-zinc-200 transition-colors hover:border-zinc-700 hover:text-white"
                         >
-                          <CheckCircle2 className="h-3.5 w-3.5 text-zinc-400" />
+                          <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-zinc-400" />
                           {skill.name}
                         </span>
                       ))}
@@ -374,6 +380,7 @@ export default function HomePage() {
 
       {/* Contact CTA Section */}
       <motion.section
+        id="contact"
         initial={{ opacity: 0, scale: 0.9, y: 30 }}
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}

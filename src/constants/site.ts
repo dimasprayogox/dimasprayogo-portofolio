@@ -1,6 +1,6 @@
 export const SITE_CONFIG = {
   name: "Dimas Prayogo",
-  role: "Software Engineer",
+  role: "Full Stack Developer | Software Engineer",
   bio: "Lulusan S1 Teknik Informatika dengan pengalaman magang sebagai Software Engineer. Memiliki kemampuan dalam pengembangan perangkat lunak, analisis dan perancangan sistem, serta problem solving.",
   location: "Madiun, Jawa Timur",
   email: "dimasprayogo9c@gmail.com",
@@ -12,9 +12,11 @@ export const SITE_CONFIG = {
 };
 
 export const PUBLIC_NAV_ITEMS = [
-  { label: "Home", href: "/" },
-  { label: "Projects", href: "/projects" },
-  { label: "Contact", href: "/contact" },
+  { label: "Home", href: "/#home" },
+  { label: "Projects", href: "/#projects" },
+  { label: "Experience", href: "/#experience" },
+  { label: "Skills", href: "/#skills" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export const ADMIN_NAV_ITEMS = [

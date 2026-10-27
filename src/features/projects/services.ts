@@ -5,11 +5,19 @@ import { MOCK_PROJECTS } from "./mock";
 const LOCAL_STORAGE_KEY = "portfolio_projects_custom_v1";
 
 function mapFromDb(item: Record<string, unknown>): Project {
-  const images = Array.isArray(item.images)
+  let images = Array.isArray(item.images)
     ? (item.images as string[])
     : typeof item.image_url === "string" && item.image_url
     ? [item.image_url]
     : [];
+
+  // Convert blocked Cloudflare R2 development domains (r2.dev) to our local API proxy
+  images = images.map((url) => {
+    if (typeof url === "string" && url.includes(".r2.dev/")) {
+      return url.replace(/https?:\/\/[^/]+\.r2\.dev\//, "/api/assets/");
+    }
+    return url;
+  });
 
   return {
     id: String(item.id),
