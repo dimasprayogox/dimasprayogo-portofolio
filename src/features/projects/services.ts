@@ -3,8 +3,9 @@ import { Project } from "@/types";
 import { MOCK_PROJECTS } from "./mock";
 
 const LOCAL_STORAGE_KEY = "portfolio_projects_custom_v1";
+const ORDER_STORAGE_KEY = "portfolio_projects_order_v1";
 
-function mapFromDb(item: Record<string, unknown>): Project {
+function mapFromDb(item: Record<string, unknown>, fallbackIndex: number = 0): Project {
   let images = Array.isArray(item.images)
     ? (item.images as string[])
     : typeof item.image_url === "string" && item.image_url
@@ -31,6 +32,12 @@ function mapFromDb(item: Record<string, unknown>): Project {
     images,
     imageUrl: images[0] || "",
     featured: Boolean(item.featured),
+    orderIndex:
+      typeof item.order_index === "number"
+        ? item.order_index
+        : typeof item.display_order === "number"
+        ? item.display_order
+        : fallbackIndex,
     createdAt: typeof item.created_at === "string" ? item.created_at : new Date().toISOString(),
   };
 }
@@ -52,7 +59,52 @@ function mapToDb(project: Partial<Project>) {
     dbObj.images = project.imageUrl ? [project.imageUrl] : [];
   }
   if (project.featured !== undefined) dbObj.featured = project.featured;
+  if (project.orderIndex !== undefined) dbObj.order_index = project.orderIndex;
   return dbObj;
+}
+
+function getStoredOrderIds(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const cached = localStorage.getItem(ORDER_STORAGE_KEY);
+    return cached ? JSON.parse(cached) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveStoredOrderIds(ids: string[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(ids));
+  } catch (err) {
+    console.error("LocalStorage save order error:", err);
+  }
+}
+
+function sortAndApplyOrder(projects: Project[]): Project[] {
+  const storedIds = getStoredOrderIds();
+  const idToOrder = new Map<string, number>();
+
+  if (storedIds.length > 0) {
+    storedIds.forEach((id, idx) => idToOrder.set(id, idx));
+  }
+
+  const sorted = [...projects].sort((a, b) => {
+    if (idToOrder.has(a.id) || idToOrder.has(b.id)) {
+      const orderA = idToOrder.get(a.id) ?? Infinity;
+      const orderB = idToOrder.get(b.id) ?? Infinity;
+      if (orderA !== orderB) return orderA - orderB;
+    }
+
+    const idxA = typeof a.orderIndex === "number" ? a.orderIndex : Infinity;
+    const idxB = typeof b.orderIndex === "number" ? b.orderIndex : Infinity;
+    if (idxA !== idxB) return idxA - idxB;
+
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
+  return sorted.map((p, idx) => ({ ...p, orderIndex: idx }));
 }
 
 function getLocalProjects(): Project[] {
@@ -82,21 +134,33 @@ export async function getProjects(): Promise<Project[]> {
 
   try {
     const supabase = createClient();
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from("projects")
       .select("*")
+      .order("order_index", { ascending: true, nullsFirst: false })
       .order("created_at", { ascending: false });
 
+    if (error) {
+      const fallback = await supabase
+        .from("projects")
+        .select("*")
+        .order("created_at", { ascending: false });
+      data = fallback.data;
+      error = fallback.error;
+    }
+
     if (!error && data && data.length > 0) {
-      const dbProjects = data.map(mapFromDb);
-      saveLocalProjects(dbProjects);
-      return dbProjects;
+      const dbProjects = data.map((item, idx) => mapFromDb(item, idx));
+      const ordered = sortAndApplyOrder(dbProjects);
+      saveLocalProjects(ordered);
+      return ordered;
     }
   } catch (err) {
     console.warn("Supabase fetch warning:", err);
   }
 
-  return localProjects.length > 0 ? localProjects : MOCK_PROJECTS;
+  const baseProjects = localProjects.length > 0 ? localProjects : MOCK_PROJECTS;
+  return sortAndApplyOrder(baseProjects);
 }
 
 export async function getFeaturedProjects(): Promise<Project[]> {
@@ -140,14 +204,42 @@ export async function createProject(
     ...input,
     images: fallbackImages,
     imageUrl: fallbackImages[0] || "",
+    orderIndex: input.orderIndex ?? 0,
     id: `proj_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
     createdAt: new Date().toISOString(),
   };
 
   const current = getLocalProjects();
-  const updated = [fallbackProject, ...current];
+  const updated = [fallbackProject, ...current].map((p, idx) => ({ ...p, orderIndex: idx }));
   saveLocalProjects(updated);
+  saveStoredOrderIds(updated.map((p) => p.id));
   return fallbackProject;
+}
+
+export async function reorderProjects(orderedProjects: Project[]): Promise<boolean> {
+  const updatedProjects = orderedProjects.map((p, index) => ({
+    ...p,
+    orderIndex: index,
+  }));
+
+  saveLocalProjects(updatedProjects);
+  saveStoredOrderIds(updatedProjects.map((p) => p.id));
+
+  try {
+    const supabase = createClient();
+    await Promise.allSettled(
+      updatedProjects.map((p) =>
+        supabase
+          .from("projects")
+          .update({ order_index: p.orderIndex })
+          .eq("id", p.id)
+      )
+    );
+  } catch (err) {
+    console.warn("Supabase reorder sync warning:", err);
+  }
+
+  return true;
 }
 
 export async function updateProject(

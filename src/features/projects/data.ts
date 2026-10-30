@@ -10,4 +10,5 @@ export {
   createProject,
   updateProject,
   deleteProject,
+  reorderProjects,
 } from "./services";

@@ -1,15 +1,42 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { SITE_CONFIG } from "@/constants/site";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight } from "lucide-react";
+import DecryptedText from "@/components/ui/decrypted-text";
 import BorderGlow from "@/components/ui/border-glow";
 import { motion } from "motion/react";
 
 const easeCurve: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 export default function HeroSection() {
+  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+  const [heroContentReady, setHeroContentReady] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(media.matches);
+
+    const listener = (e: MediaQueryListEvent) => {
+      setIsDesktop(e.matches);
+    };
+
+    media.addEventListener("change", listener);
+
+    const fallbackTimer = setTimeout(() => {
+      setHeroContentReady(true);
+    }, 2800);
+
+    return () => {
+      media.removeEventListener("change", listener);
+      clearTimeout(fallbackTimer);
+    };
+  }, []);
+
+  const isReady = isDesktop === false || (isDesktop === true && heroContentReady);
+
   return (
     <section id="home" className="min-h-[calc(100vh-7rem)] flex flex-col justify-center py-8 lg:py-12">
       <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
@@ -17,7 +44,7 @@ export default function HeroSection() {
         <div className="lg:col-span-7 space-y-6">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
             transition={{ duration: 0.6, ease: easeCurve }}
             className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-950 px-3.5 py-1 text-xs font-mono text-zinc-300"
           >
@@ -39,7 +66,7 @@ export default function HeroSection() {
                   <img
                     src="/avatar.webp"
                     alt={SITE_CONFIG.name}
-                    className="w-full h-full object-cover object-center grayscale hover:grayscale-0 transition-all duration-500"
+                    className="w-full h-full object-cover object-center"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/60 to-transparent pointer-events-none" />
                   <div className="absolute top-1.5 left-1.5 w-2 h-2 border-t border-l border-white/70" />
@@ -57,16 +84,30 @@ export default function HeroSection() {
                   className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight"
                 >
                   Hi, I&apos;m{" "}
-                  <span className="text-white">
-                    {SITE_CONFIG.name}
+                  <span className="text-white lg:hidden">
+                    {SITE_CONFIG.name}.
                   </span>
-                  .
+                  <span className="hidden lg:inline">
+                    <DecryptedText
+                      text={SITE_CONFIG.name}
+                      speed={90}
+                      maxIterations={25}
+                      sequential={true}
+                      revealDirection="start"
+                      animateOn="view"
+                      onAnimationComplete={() => setHeroContentReady(true)}
+                      className="text-white"
+                      encryptedClassName="text-zinc-500 font-mono"
+                      parentClassName="inline-block"
+                    />
+                    .
+                  </span>
                 </motion.h1>
 
                 <motion.p
                   initial={{ opacity: 0, scale: 0.94, y: 15 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ duration: 0.65, ease: easeCurve, delay: 0.15 }}
+                  animate={isReady ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.94, y: 15 }}
+                  transition={{ duration: 0.65, ease: easeCurve, delay: isDesktop ? 0.1 : 0.15 }}
                   className="text-sm sm:text-base lg:text-2xl text-zinc-300 font-medium leading-snug"
                 >
                   {SITE_CONFIG.role}
@@ -76,8 +117,8 @@ export default function HeroSection() {
 
             <motion.p
               initial={{ opacity: 0, x: -25 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.65, ease: easeCurve, delay: 0.25 }}
+              animate={isReady ? { opacity: 1, x: 0 } : { opacity: 0, x: -25 }}
+              transition={{ duration: 0.65, ease: easeCurve, delay: isDesktop ? 0.25 : 0.25 }}
               className="text-base text-zinc-400 leading-relaxed pt-2 max-w-2xl"
             >
               {SITE_CONFIG.bio}
@@ -86,8 +127,8 @@ export default function HeroSection() {
 
           <motion.div
             initial={{ opacity: 0, y: 25 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, ease: easeCurve, delay: 0.35 }}
+            animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 25 }}
+            transition={{ duration: 0.65, ease: easeCurve, delay: isDesktop ? 0.4 : 0.35 }}
             className="flex flex-wrap items-center gap-3 pt-2"
           >
             <Link href="/projects">
@@ -107,8 +148,8 @@ export default function HeroSection() {
         {/* Right Column: Profile Photo Frame */}
         <motion.div
           initial={{ opacity: 0, x: 40, scale: 0.95 }}
-          animate={{ opacity: 1, x: 0, scale: 1 }}
-          transition={{ duration: 0.75, ease: easeCurve, delay: 0.25 }}
+          animate={isReady ? { opacity: 1, x: 0, scale: 1 } : { opacity: 0, x: 40, scale: 0.95 }}
+          transition={{ duration: 0.75, ease: easeCurve, delay: isDesktop ? 0.3 : 0.25 }}
           className="hidden lg:flex lg:col-span-5 justify-end"
         >
           <BorderGlow

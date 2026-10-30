@@ -10,6 +10,7 @@ export interface Project {
   images?: string[];
   imageUrl?: string;
   featured: boolean;
+  orderIndex?: number;
   createdAt: string;
 }
 

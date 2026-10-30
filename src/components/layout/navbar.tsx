@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PUBLIC_NAV_ITEMS, SITE_CONFIG } from "@/constants/site";
 import { cn } from "@/lib/utils";
-import { ShieldCheck, Menu, X } from "lucide-react";
+import { ShieldCheck, Menu, X, Mail } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export function Navbar() {
@@ -15,7 +15,7 @@ export function Navbar() {
   useEffect(() => {
     if (pathname !== "/") return;
 
-    const sections = ["contact", "skills", "certifications", "education", "experience", "projects", "home"];
+    const sections = ["skills", "certifications", "education", "experience", "projects", "home"];
 
     const handleScroll = () => {
       const scrollY = window.scrollY;
@@ -93,11 +93,11 @@ export function Navbar() {
           })}
           <div className="h-4 w-px bg-zinc-800" />
           <Link
-            href="/admin"
+            href="/contact"
             className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs font-mono text-zinc-300 transition-colors hover:border-zinc-700 hover:text-white"
           >
-            <ShieldCheck className="h-3.5 w-3.5" />
-            Admin
+            <Mail className="h-3.5 w-3.5" />
+            Contact
           </Link>
         </nav>
 
@@ -137,11 +137,11 @@ export function Navbar() {
               );
             })}
             <Link
-              href="/admin"
+              href="/contact"
               onClick={() => setMobileMenuOpen(false)}
               className="mt-2 flex items-center gap-2 rounded-md border border-zinc-800 bg-zinc-900 p-2 text-xs font-mono text-zinc-300"
             >
-              <ShieldCheck className="h-4 w-4" /> Admin
+              <Mail className="h-4 w-4" /> Contact
             </Link>
           </nav>
         </div>

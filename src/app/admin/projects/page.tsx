@@ -6,6 +6,7 @@ import {
   createProject,
   updateProject,
   deleteProject,
+  reorderProjects,
 } from "@/features/projects/services";
 import { ProjectTable } from "@/features/projects/components/project-table";
 import { ProjectModal, ProjectFormData } from "@/features/projects/components/project-modal";
@@ -48,6 +49,26 @@ export default function AdminProjectsPage() {
     await fetchProjects();
   };
 
+  const handleMoveUp = async (index: number) => {
+    if (index <= 0) return;
+    const next = [...projects];
+    const temp = next[index];
+    next[index] = next[index - 1];
+    next[index - 1] = temp;
+    setProjects(next);
+    await reorderProjects(next);
+  };
+
+  const handleMoveDown = async (index: number) => {
+    if (index >= projects.length - 1) return;
+    const next = [...projects];
+    const temp = next[index];
+    next[index] = next[index + 1];
+    next[index + 1] = temp;
+    setProjects(next);
+    await reorderProjects(next);
+  };
+
   const handleSubmit = async (formData: ProjectFormData, newFiles: File[] = []) => {
     setUploading(true);
 
@@ -75,6 +96,7 @@ export default function AdminProjectsPage() {
       images: allImages,
       imageUrl: allImages[0] || "",
       featured: formData.featured,
+      orderIndex: editingProject ? editingProject.orderIndex : 0,
     };
 
     if (editingProject) {
@@ -112,6 +134,8 @@ export default function AdminProjectsPage() {
           projects={projects}
           onEdit={handleOpenEdit}
           onDelete={handleDelete}
+          onMoveUp={handleMoveUp}
+          onMoveDown={handleMoveDown}
         />
       )}
 

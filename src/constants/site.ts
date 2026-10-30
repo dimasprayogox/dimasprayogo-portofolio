@@ -15,8 +15,7 @@ export const PUBLIC_NAV_ITEMS = [
   { label: "Home", href: "/#home" },
   { label: "Projects", href: "/#projects" },
   { label: "Experience", href: "/#experience" },
-  { label: "Skills", href: "/#skills" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Skills", href: "/#skills" }
 ];
 
 export const ADMIN_NAV_ITEMS = [

@@ -28,6 +28,7 @@ export const MOCK_PROJECTS: Project[] = [
       "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=800&q=80",
     ],
     featured: true,
+    orderIndex: 0,
     createdAt: "2026-07-01T00:00:00.000Z",
   },
   {
@@ -47,6 +48,7 @@ export const MOCK_PROJECTS: Project[] = [
       "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80",
     ],
     featured: true,
+    orderIndex: 1,
     createdAt: "2025-09-01T00:00:00.000Z",
   },
 ];

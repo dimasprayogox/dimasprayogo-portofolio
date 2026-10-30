@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { GithubIcon } from "@/components/shared/icons";
 import { ArrowUpRight, ExternalLink, Mail, CheckCircle2, Terminal, Images, GraduationCap, Award } from "lucide-react";
 import { Project, Experience, Skill, Education, Certification } from "@/types";
+import { ProjectCoverImage } from "@/features/projects/components/project-cover-image";
 import HeroSection from "@/components/home/hero-section";
 import BorderGlow from "@/components/ui/border-glow";
 import { motion } from "motion/react";
@@ -81,20 +82,11 @@ export default function HomePage() {
                 >
                   <Card className="flex flex-col justify-between overflow-hidden p-0 h-full hover:border-zinc-700 transition-colors relative">
                     {coverImage && (
-                      <div className="h-44 w-full overflow-hidden bg-zinc-900 border-b border-zinc-800 relative">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={coverImage}
-                          alt={project.title}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        {totalImages > 1 && (
-                          <div className="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-black/75 px-1.5 py-0.5 text-[10px] font-mono text-zinc-300 backdrop-blur-xs">
-                            <Images className="h-3 w-3" />
-                            {totalImages}
-                          </div>
-                        )}
-                      </div>
+                      <ProjectCoverImage
+                        src={coverImage}
+                        alt={project.title}
+                        totalImages={totalImages}
+                      />
                     )}
                     <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
                       <div>
