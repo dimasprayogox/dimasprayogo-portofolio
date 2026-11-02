@@ -6,7 +6,7 @@ export function Footer() {
   return (
     <footer className="w-full border-t border-zinc-800/80 bg-black text-zinc-400">
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
-        <p className="text-xs text-zinc-500 font-mono">
+        <p className="text-xs text-zinc-400 font-mono">
           &copy; {new Date().getFullYear()} {SITE_CONFIG.name}. Built with Next.js & Tailwind CSS.
         </p>
 

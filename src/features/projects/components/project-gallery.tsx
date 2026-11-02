@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, Image as ImageIcon } from "lucide-react";
 
 interface ProjectGalleryProps {
@@ -8,17 +9,18 @@ interface ProjectGalleryProps {
   images: string[];
 }
 
+// ponytail: optimized gallery with explicit dimensions and WCAG AA contrast colors
 export function ProjectGallery({ title, images }: ProjectGalleryProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   if (images.length === 0) {
     return (
       <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-12 text-center space-y-3">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900 text-zinc-500">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900 text-zinc-400">
           <ImageIcon className="h-6 w-6" />
         </div>
-        <p className="text-sm font-mono text-zinc-400">No screenshot provided</p>
-        <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+        <p className="text-sm font-mono text-zinc-300">No screenshot provided</p>
+        <p className="text-xs text-zinc-400 max-w-sm mx-auto">
           Visit the live demo or source code links above to view the project in action.
         </p>
       </div>
@@ -34,11 +36,13 @@ export function ProjectGallery({ title, images }: ProjectGalleryProps) {
           className="absolute inset-0 bg-cover bg-center blur-2xl opacity-25 scale-110 pointer-events-none"
           style={{ backgroundImage: `url(${currentImg})` }}
         />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={currentImg}
           alt={`${title} screenshot ${activeImageIndex + 1}`}
+          width={800}
+          height={520}
           className="relative z-10 max-h-[520px] max-w-full w-auto h-auto object-contain rounded-lg shadow-2xl"
+          loading="lazy"
         />
 
         {images.length > 1 && (
@@ -87,11 +91,13 @@ export function ProjectGallery({ title, images }: ProjectGalleryProps) {
                   : "border-zinc-800 opacity-60 hover:opacity-100"
               }`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={img}
                 alt={`Thumbnail ${idx + 1}`}
+                width={96}
+                height={64}
                 className="h-full w-full object-contain"
+                loading="lazy"
               />
             </button>
           ))}

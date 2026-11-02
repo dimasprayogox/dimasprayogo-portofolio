@@ -34,7 +34,7 @@ export default async function ProjectsPage() {
       {projects.length === 0 ? (
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-12 text-center space-y-2">
           <p className="text-sm text-zinc-400 font-mono">No projects found.</p>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-zinc-400">
             Add projects via the Admin dashboard to display them here.
           </p>
         </div>

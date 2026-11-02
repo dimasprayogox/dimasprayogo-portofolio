@@ -57,7 +57,7 @@ export default function HomePage() {
         </motion.div>
 
         {featuredProjects.length === 0 ? (
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-8 text-center text-xs font-mono text-zinc-500">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-8 text-center text-xs font-mono text-zinc-400">
             No featured projects yet.
           </div>
         ) : (
@@ -177,9 +177,9 @@ export default function HomePage() {
                   </div>
                   <span className="text-xs font-mono text-zinc-400">{exp.period}</span>
                 </div>
-                {exp.location && (
-                  <p className="text-xs font-mono text-zinc-500">{exp.location}</p>
-                )}
+              {exp.location && (
+                <p className="text-xs font-mono text-zinc-400">{exp.location}</p>
+              )}
                 <ul className="space-y-1 text-sm text-zinc-400 list-disc list-inside">
                   {exp.description.map((item: string, idx: number) => (
                     <li key={idx} className="leading-relaxed">
@@ -272,10 +272,10 @@ export default function HomePage() {
               >
                 <Card className="p-5 space-y-3 h-full flex flex-col justify-between">
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs font-mono text-emerald-400">
-                      <span>{cert.issuer}</span>
-                      <span className="text-zinc-500">{cert.issueDate}</span>
-                    </div>
+                <div className="flex items-center justify-between text-xs font-mono text-emerald-400">
+                  <span>{cert.issuer}</span>
+                  <span className="text-zinc-400">{cert.issueDate}</span>
+                </div>
                     <h3 className="text-sm font-semibold text-white leading-snug">{cert.title}</h3>
                     {cert.credentialId && (
                       <p className="text-xs font-mono text-zinc-400">
