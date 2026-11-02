@@ -1,25 +1,23 @@
-"use client";
-
-import { useState, useEffect } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getProjects } from "@/features/projects/services";
 import { Card, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GithubIcon } from "@/components/shared/icons";
-import { ExternalLink, ArrowLeft, Images } from "lucide-react";
+import { ExternalLink, ArrowLeft } from "lucide-react";
 import { Project } from "@/types";
 import { ProjectCoverImage } from "@/features/projects/components/project-cover-image";
 
-export default function ProjectsPage() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
+export const metadata: Metadata = {
+  title: "Projects",
+  description: "Koleksi proyek perangkat lunak dan portofolio engineering oleh Dimas Prayogo.",
+  alternates: {
+    canonical: "/projects",
+  },
+};
 
-  useEffect(() => {
-    getProjects().then((data) => {
-      setProjects(data);
-      setLoading(false);
-    });
-  }, []);
+export default async function ProjectsPage() {
+  const projects = await getProjects();
 
   return (
     <div className="space-y-10">
@@ -31,14 +29,9 @@ export default function ProjectsPage() {
           <ArrowLeft className="h-3 w-3" /> Back to Home
         </Link>
         <h1 className="text-3xl font-bold tracking-tight text-white">All Projects</h1>
-
       </div>
 
-      {loading ? (
-        <div className="p-12 text-center text-xs font-mono text-zinc-500">
-          Loading projects...
-        </div>
-      ) : projects.length === 0 ? (
+      {projects.length === 0 ? (
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-12 text-center space-y-2">
           <p className="text-sm text-zinc-400 font-mono">No projects found.</p>
           <p className="text-xs text-zinc-500">
